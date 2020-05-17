@@ -63,13 +63,9 @@
         then 'true'
         else 'false'
         end checked
-        from tb_role r
-        join tb_role_module rm
-        join tb_module p
+        from tb_module p
         join tb_module c
-        on p.module_code = rm.module_id
-        and r.role_id = rm.role_id
-        and p.module_code = c.parent_module
+        on p.module_code = c.parent_module
         and p.parent_module = '0101';
     </select>
 </mapper>

@@ -15,4 +15,8 @@ public interface IModuleService extends IService<Module> {
     List<ModuleTreeNode> getModuleTreeNodeByAccount(String account);
 
     List<ModuleTreeNode> getModuleTreeNodeByRoleName(String roleName);
+
+    void grantModuleToRole(String moduleName,String roleId);
+
+    void removeModuleFromRole(String moduleName,String roleId);
 }

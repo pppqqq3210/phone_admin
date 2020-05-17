@@ -85,20 +85,42 @@
             }
             //将角色名称作为参数，查询权限
             var roleName = checkedBox.parent().parent().find(".roleName").text();
+            var roleId = checkedBox.parent().parent().find(".code").text();
             $.get("http://localhost:8080/module/getRoleModuleTreeNodes?roleName="+roleName,
                 function(resp){
-                    $('#role-treeview').treeview({
+                    var tree = $('#role-treeview').treeview({
                         data: resp.data,
                         levels:1,
                         showIcon: false,
                         showCheckbox: true,
                         onNodeChecked: function(event, node) {
+                            console.log(node);
+                            if(node.parentId != undefined){
+                                tree.treeview("checkNode",node.parentId);
+                            }
                             //alert(node.text+"被选中");
                             //如果添加的是子级权限，应该同时添加其父级权限
+                            // $.post("http://localhost:8080/module/grantModuleToRole",
+                            //     {"moduleName":node.text,"roleId":roleId},
+                            //     function (resp) {
+                            //         // alert(resp.msg);
+                            //         //选中父级节点
+                            //     });
                         },
                         onNodeUnchecked: function (event, node) {
+                            console.log(node);
+                            if(node.nodes != undefined && node.nodes.length > 0){
+                                for(var i = 0;i < node.nodes.length;i++){
+                                    tree.treeview("uncheckNode",node.nodes[i].nodeId);
+                                }
+                            }
                             //alert(node.text+"取消选中");
                             //如果删除的是父级权限，应该同时删除其子级权限
+                            // $.post("http://localhost:8080/module/removeModuleFromRole",
+                            //     {"moduleName":node.text,"roleId":roleId},
+                            //     function (resp) {
+                            //         // alert(resp.msg);
+                            //     });
                         }
                     });
                 });

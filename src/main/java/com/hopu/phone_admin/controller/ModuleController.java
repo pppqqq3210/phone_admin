@@ -5,6 +5,7 @@ import com.hopu.phone_admin.entity.ModuleTreeNode;
 import com.hopu.phone_admin.service.IModuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +28,7 @@ public class ModuleController {
             return new JsonResult(500,"failed",null);
         }
     }
+
     @GetMapping("getRoleModuleTreeNodes")
     public JsonResult getRoleModuleTreeNodes(String roleName){
         try {
@@ -46,6 +48,30 @@ public class ModuleController {
                 }
             }
             return new JsonResult(200,"success",nodes);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new JsonResult(500,"failed",null);
+        }
+    }
+
+    @PostMapping("grantModuleToRole")
+    public JsonResult grantModuleToRole(String moduleName,String roleId){
+
+        try {
+            moduleService.grantModuleToRole(moduleName,roleId);
+            return new JsonResult(200,"success",null);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return new JsonResult(500,"failed",null);
+        }
+    }
+
+    @PostMapping("removeModuleFromRole")
+    public JsonResult removeModuleToRole(String moduleName,String roleId){
+
+        try {
+            moduleService.removeModuleFromRole(moduleName,roleId);
+            return new JsonResult(200,"success",null);
         }catch (Exception ex){
             ex.printStackTrace();
             return new JsonResult(500,"failed",null);

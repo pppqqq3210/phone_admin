@@ -41,4 +41,12 @@ public class RoleModule {
     this.roleId = roleId;
   }
 
+  public RoleModule(long id, String moduleId, String roleId) {
+    this.id = id;
+    this.moduleId = moduleId;
+    this.roleId = roleId;
+  }
+
+  public RoleModule() {
+  }
 }
