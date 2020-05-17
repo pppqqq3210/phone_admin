@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--配置接口的映射，namespace命名空间设置为包名+接口名-->
+<mapper namespace="com.hopu.phone_admin.dao.RoleMapper">
+
+    <select id="selectRolesByAccount" resultType="Role" parameterType="java.lang.String">
+        select r.role_id roleId,role_name roleName,role_desc roleDesc,role_order roleOrder,role_type roleType
+        from tb_user u join tb_role r join tb_user_role ur
+        on u.user_id = ur.user_id and r.role_id = ur.role_id
+        and u.user_login_account = #{account};
+    </select>
+</mapper>

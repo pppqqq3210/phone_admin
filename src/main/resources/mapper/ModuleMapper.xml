@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--配置接口的映射，namespace命名空间设置为包名+接口名-->
+<mapper namespace="com.hopu.phone_admin.dao.ModuleMapper">
+
+    <resultMap id="moduleMap" type="ModuleTreeNode">
+        <result property="text" column="p_name"/>
+        <result property="href" column="p_url"/>
+        <result property="checked" column="checked"/>
+        <collection property="nodes" javaType="java.util.List" ofType="ModuleTreeNode">
+            <result property="text" column="c_name"/>
+            <result property="href" column="c_url"/>
+            <result property="checked" column="checked"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectModuleTreeNodeByAccount" resultMap="moduleMap" parameterType="java.lang.String">
+        select p.module_name p_name,p.link_url p_url,c.module_name c_name,c.link_url c_url
+        from tb_user u
+        join tb_role r
+        join tb_user_role ur
+        join tb_role_module rm
+        join tb_module p
+        join tb_module c
+        on u.user_id = ur.user_id
+        and r.role_id = ur.role_id
+        and p.module_code = rm.module_id
+        and r.role_id = rm.role_id
+        and p.module_code = c.parent_module
+        and p.parent_module = '0101'
+        and u.user_login_account = #{account};
+    </select>
+
+    <select id="selectModulesByAccount" resultType="Module" parameterType="java.lang.String">
+        select m.module_id moduleId,m.module_code moduleCode,m.module_name moduleName,m.link_url linkUrl,m.module_order moduleOrder,
+        m.parent_module parentModule,m.module_desc moduleDesc,m.expanded expanded,m.leaf leaf
+        from tb_user u JOIN tb_role r JOIN tb_user_role ur JOIN tb_module m join tb_role_module rm
+        on u.user_id = ur.user_id and r.role_id = ur.role_id and rm.module_id = m.module_code and rm.role_id = r.role_id
+        and u.user_login_account = #{account};
+    </select>
+
+    <select id="selectModuleTreeNodeByRoleName" resultMap="moduleMap" parameterType="java.lang.String">
+        select DISTINCT p.module_name p_name,p.link_url p_url,c.module_name c_name,c.link_url c_url,
+        case
+	    when
+	    exists(
+		select * from (
+			select c.module_name c_name1
+    		from tb_role r
+    		join tb_role_module rm
+    		join tb_module p
+    		join tb_module c
+    		on  c.module_code = rm.module_id
+    		and r.role_id = rm.role_id
+    		and p.module_code = c.parent_module
+    		and p.parent_module = '0101'
+    		and r.role_name = #{roleName}
+    	) role_module
+    	where role_module.c_name1 = c.module_name
+        )
+        then 'true'
+        else 'false'
+        end checked
+        from tb_role r
+        join tb_role_module rm
+        join tb_module p
+        join tb_module c
+        on p.module_code = rm.module_id
+        and r.role_id = rm.role_id
+        and p.module_code = c.parent_module
+        and p.parent_module = '0101';
+    </select>
+</mapper>

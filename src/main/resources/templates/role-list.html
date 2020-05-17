@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="images/favicon.ico">
+    <base th:href="${#request.getContextPath()}+'/'">
+
+    <title>角色管理</title>
+    <!-- Bootstrap core CSS -->
+    <link href="http://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/dashboard.css" rel="stylesheet">
+    <link href="css/bootstrap-treeview.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="css/signin.css" rel="stylesheet">
+
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <h2 class="sub-header">角色管理</h2>
+        <button type="button" id="grant" class="btn btn-sm btn-info">授权</button>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>角色序号</th>
+                    <th>角色代码</th>
+                    <th>角色名称</th>
+                    <th>角色描述</th>
+                    <th>角色类型</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="role:${roles}" class="role-tr">
+                    <td><input type="checkbox" name="ck-role" class="ck-role"></td>
+                    <td th:text="${role.roleOrder}"></td>
+                    <td class="code" th:text="${role.roleId}"></td>
+                    <td class="roleName" th:text="${role.roleName}"></td>
+                    <td th:text="${role.roleDesc}"></td>
+                    <td th:text="${role.roleType}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div> <!-- /container -->
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body" id="role-treeview">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-treeview.js"></script>
+<script type="text/javascript">
+    $(function(){
+        //给角色的数据行添加点击事件实现复选框单选效果
+        $(".role-tr").click(function(){
+            //去掉所有复选框的选中效果
+            $(".ck-role").prop("checked",false);
+            //给当前点击行的复选框设置选中效果
+            $(this).find(".ck-role").prop("checked",true);
+        });
+        //弹出模态框
+        $("#grant").click(function () {
+            var checkedBox = $(":checkbox:checked");
+            if(checkedBox.length == 0){
+                alert("必须选择角色");
+                return;
+            }
+            //将角色名称作为参数，查询权限
+            var roleName = checkedBox.parent().parent().find(".roleName").text();
+            $.get("http://localhost:8080/module/getRoleModuleTreeNodes?roleName="+roleName,
+                function(resp){
+                    $('#role-treeview').treeview({
+                        data: resp.data,
+                        levels:1,
+                        showIcon: false,
+                        showCheckbox: true,
+                        onNodeChecked: function(event, node) {
+                            //alert(node.text+"被选中");
+                            //如果添加的是子级权限，应该同时添加其父级权限
+                        },
+                        onNodeUnchecked: function (event, node) {
+                            //alert(node.text+"取消选中");
+                            //如果删除的是父级权限，应该同时删除其子级权限
+                        }
+                    });
+                });
+            $("#myModal").modal('show');
+        })
+    });
+</script>
+</body>
+</html>
